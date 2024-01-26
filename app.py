@@ -9,9 +9,13 @@ Please refer to these links below for more information:
 
 from dataclasses import asdict
 
+from modelscope import AutoModelForCausalLM, AutoTokenizer
+#from modelscope import GenerationConfig
+
 import streamlit as st
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+import re  
+#from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import logging
 
 from tools.transformers.interface import GenerationConfig, generate_interactive
@@ -76,7 +80,7 @@ def main():
     user_avator = "images/user.png"
     robot_avator = "images/robot.png"
 
-    st.title("Recipe for the cook | by gxc")
+    st.title("Assistant for the Cook by gxc")
 
     generation_config = prepare_generation_config()
 
@@ -91,28 +95,43 @@ def main():
 
     # Accept user input
     if prompt := st.chat_input("What is up?"):
+        # Check if the user input contains certain keywords
+        keywords = ["how to cook", "recipe", "ocok dishes"]
+        contains_keywords = any(keyword in prompt for keyword in keywords)
+
         # Display user message in chat message container
         with st.chat_message("user", avatar=user_avator):
             st.markdown(prompt)
         real_prompt = combine_history(prompt)
+
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt, "avatar": user_avator})
 
-        with st.chat_message("robot", avatar=robot_avator):
-            message_placeholder = st.empty()
-            for cur_response in generate_interactive(
-                model=model,
-                tokenizer=tokenizer,
-                prompt=real_prompt,
-                additional_eos_token_id=103028,
-                **asdict(generation_config),
-            ):
-                # Display robot response in chat message container
-                message_placeholder.markdown(cur_response + "▌")
-            message_placeholder.markdown(cur_response)
-        # Add robot response to chat history
-        st.session_state.messages.append({"role": "robot", "content": cur_response, "avatar": robot_avator})
-        torch.cuda.empty_cache()
+        # If keywords are not present, display a prompt message immediately
+        if not contains_keywords:
+            with st.chat_message("robot", avatar=robot_avator):
+                #st.markdown("我是食神周星星的唯一传人张小白，我什么菜都会做，包括黑暗料理，您可以问我什么菜怎么做，我会告诉你具体的做法。")
+                st.markdown("I am good at all kinds of dishes,from every country,all styles,so just ask me,then I take the rest")
+            # Add robot response to chat history
+            st.session_state.messages.append({"role": "robot", "content": "I am Mr known-all,all you need is to ask me how to cook。", "avatar": robot_avator})
+        else:
+            # Generate robot response
+            with st.chat_message("robot", avatar=robot_avator):
+                message_placeholder = st.empty()
+                for cur_response in generate_interactive(
+                    model=model,
+                    tokenizer=tokenizer,
+                    prompt=real_prompt,
+                    additional_eos_token_id=103028,
+                    **asdict(generation_config),
+                ):
+                    # Display robot response in chat message container
+                    message_placeholder.markdown(cur_response + "▌")
+                message_placeholder.markdown(cur_response)
+            # Add robot response to chat history
+            st.session_state.messages.append({"role": "robot", "content": cur_response, "avatar": robot_avator})
+            torch.cuda.empty_cache()
+
 
 
 if __name__ == "__main__":
