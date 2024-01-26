@@ -3,8 +3,8 @@ This script refers to the dialogue example of streamlit, the interactive generat
 We mainly modified part of the code logic to adapt to the generation of our model.
 Please refer to these links below for more information:
     1. streamlit chat example: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
-    2. chatglm2: https://github.com/THUDM/ChatGLM2-6B
-    3. transformers: https://github.com/huggingface/transformers
+    2. chatglm2: https://githubfast.com/THUDM/ChatGLM2-6B
+    3. transformers: https://githubfast.com/huggingface/transformers
 """
 
 from dataclasses import asdict
@@ -26,11 +26,11 @@ def on_btn_click():
 @st.cache_resource
 def load_model():
     model = (
-        AutoModelForCausalLM.from_pretrained("./merged", trust_remote_code=True)
+        AutoModelForCausalLM.from_pretrained("./internlm-chat-7b-for-recipe", trust_remote_code=True)
         .to(torch.bfloat16)
         .cuda()
     )
-    tokenizer = AutoTokenizer.from_pretrained("./merged", trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained("./internlm-chat-7b-for-recipe", trust_remote_code=True)
     return model, tokenizer
 
 
