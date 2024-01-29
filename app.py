@@ -77,8 +77,8 @@ def main():
     model, tokenizer = load_model()
     print("load model end.")
 
-    user_avator = "images/user.png"
-    robot_avator = "images/robot.png"
+    user_avator = "https://github.com/zhanghui-china/intro_myself/blob/a0404a9cac7c91aa6ae580b2eaf7ae49fd0f8cd5/images/user.png"
+    robot_avator = "https://github.com/zhanghui-china/intro_myself/blob/a0404a9cac7c91aa6ae580b2eaf7ae49fd0f8cd5/images/robot.png"
 
     st.title("Assistant for the Cook by gxc")
 
